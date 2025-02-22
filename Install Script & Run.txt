@@ -1,0 +1,8 @@
+Using PyCharm to create project > make sure to use python 3.10.9
+
+#Install libaries
+Open terminal, run: pip install flask pandas nltk spacy streamlit pdfminer.six
+
+Run local virutal env: python app.py
+
+Run browser upload page, open new terminal: streamlit run ui.py
