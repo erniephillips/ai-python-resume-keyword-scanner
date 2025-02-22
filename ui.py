@@ -1,15 +1,16 @@
 import streamlit as st
 import requests
 import socket
+import os
 
 
-# Detect if running locally
+# Detect if running locally using environment variables
 def is_running_locally():
+    if "STREAMLIT_SERVER" in os.environ:
+        return False  # Running on Streamlit Cloud
     try:
         host_name = socket.gethostname()
         local_ip = socket.gethostbyname(host_name)
-        # Debug: Print detected IP
-        st.sidebar.write(f"🖥️ Detected Local IP: {local_ip}")
         return local_ip.startswith("127.") or local_ip.startswith("192.") or "localhost" in host_name
     except:
         return False
@@ -19,13 +20,12 @@ def is_running_locally():
 LOCAL_API_URL = "http://127.0.0.1:5000/upload"
 DEPLOYED_API_URL = "https://ai-python-resume-keyword-scanner.onrender.com/upload"
 
-API_URL = DEPLOYED_API_URL  # Default to deployed URL
+API_URL = DEPLOYED_API_URL if not is_running_locally() else LOCAL_API_URL
 
-if is_running_locally():
-    API_URL = LOCAL_API_URL
-
-# Debug: Print API selection
+# Debug: Display API URL
+st.sidebar.write(f"🖥️ Detected Local IP: {socket.gethostbyname(socket.gethostname())}")
 st.sidebar.write(f"🌍 API URL: {API_URL}")
+st.sidebar.write(f"🚀 Using API: {API_URL}")
 
 # Streamlit UI
 st.title("📄 Resume Keyword Scanner")
@@ -54,5 +54,4 @@ if st.button("Analyze"):
         except requests.exceptions.Timeout:
             st.error("❌ Request timed out. API may be slow or down.")
 
-# Debug: Show the API URL for verification
-st.sidebar.write(f"🚀 Using API: {API_URL}")
+st.sidebar.write(f"🚀 Final API in use: {API_URL}")
