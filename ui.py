@@ -5,7 +5,6 @@ import socket
 # Detect if running locally
 def is_running_locally():
     try:
-        # Get the hostname and check if it's a local machine
         host_name = socket.gethostname()
         local_ip = socket.gethostbyname(host_name)
         return local_ip.startswith("127.") or local_ip.startswith("192.") or local_ip == "localhost"
@@ -29,16 +28,23 @@ if st.button("Analyze"):
             "resume": uploaded_resume,
             "job_description": uploaded_job_desc
         }
-        response = requests.post(API_URL, files=files)
 
-        if response.status_code == 200:
-            missing_keywords = response.json().get("missing_keywords", [])
-            st.subheader("🔍 Missing Keywords:")
-            st.write(", ".join(missing_keywords) if missing_keywords else "✅ No missing keywords found!")
-        else:
-            st.error("Error analyzing the resume. Try again.")
-    else:
-        st.error("Please upload both files before clicking analyze.")
+        try:
+            # Debugging: Test API Connection before making request
+            test_response = requests.get(API_URL.replace("/upload", ""))
+            if test_response.status_code != 200:
+                st.error(f"❌ Could not connect to API. Status: {test_response.status_code}")
+            else:
+                # Proceed with actual request
+                response = requests.post(API_URL, files=files)
+                if response.status_code == 200:
+                    missing_keywords = response.json().get("missing_keywords", [])
+                    st.subheader("🔍 Missing Keywords:")
+                    st.write(", ".join(missing_keywords) if missing_keywords else "✅ No missing keywords found!")
+                else:
+                    st.error("Error analyzing the resume. Try again.")
+        except requests.exceptions.ConnectionError:
+            st.error("❌ Connection Error: Unable to reach API. Check Render logs.")
 
 # Display the current API URL for debugging
 st.sidebar.write(f"**API URL:** {API_URL}")
