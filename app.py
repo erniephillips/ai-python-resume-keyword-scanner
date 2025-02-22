@@ -11,7 +11,7 @@ UPLOAD_FOLDER = "uploads"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 
-@app.route("/uploads", methods=["POST"])
+@app.route("/upload", methods=["POST"])
 def upload_files():
     if "resume" not in request.files or "job_description" not in request.files:
         return jsonify({"error": "Please upload both resume (PDF) and job description (TXT)."}), 400
