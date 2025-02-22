@@ -1,31 +1,14 @@
 import streamlit as st
 import requests
-import socket
-import os
 
+# Detect if running on localhost by checking Streamlit's page URL
+if st.query_params.get("is_local") == "true":
+    API_URL = "http://127.0.0.1:5000/upload"  # Local Flask API
+else:
+    API_URL = "https://ai-python-resume-keyword-scanner.onrender.com/upload"  # Deployed API
 
-# Detect if running locally using environment variables
-def is_running_locally():
-    if "STREAMLIT_SERVER" in os.environ:
-        return False  # Running on Streamlit Cloud
-    try:
-        host_name = socket.gethostname()
-        local_ip = socket.gethostbyname(host_name)
-        return local_ip.startswith("127.") or local_ip.startswith("192.") or "localhost" in host_name
-    except:
-        return False
-
-
-# Set API URL based on environment
-LOCAL_API_URL = "http://127.0.0.1:5000/upload"
-DEPLOYED_API_URL = "https://ai-python-resume-keyword-scanner.onrender.com/upload"
-
-API_URL = DEPLOYED_API_URL if not is_running_locally() else LOCAL_API_URL
-
-# Debug: Display API URL
-st.sidebar.write(f"🖥️ Detected Local IP: {socket.gethostbyname(socket.gethostname())}")
+# Debug: Show API URL
 st.sidebar.write(f"🌍 API URL: {API_URL}")
-st.sidebar.write(f"🚀 Using API: {API_URL}")
 
 # Streamlit UI
 st.title("📄 Resume Keyword Scanner")
