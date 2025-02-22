@@ -6,3 +6,5 @@ Open terminal, run: pip install flask pandas nltk spacy streamlit pdfminer.six
 Run local virutal env: python app.py
 
 Run browser upload page, open new terminal: streamlit run ui.py
+
+# API URL Test: curl -k -X POST -F "resume=@_Resume20250217.pdf" -F "job_description=@Customer Service Representative.txt" https://ai-python-resume-keyword-scanner.onrender.com/upload
