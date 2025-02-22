@@ -3,9 +3,13 @@ from resume_parser import extract_text_from_pdf
 from job_parser import extract_text_from_txt
 from text_cleaner import clean_text
 from keyword_matcher import find_missing_keywords
+from flask_cors import CORS
+
 import os
 
+
 app = Flask(__name__)
+CORS(app)
 
 UPLOAD_FOLDER = "uploads"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
