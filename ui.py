@@ -2,8 +2,8 @@ import streamlit as st
 import requests
 
 # Detect if running on localhost by checking query parameters
-API_URL = "http://127.0.0.1:10000/upload"  # Local Flask API
-#API_URL = "https://ai-python-resume-keyword-scanner.onrender.com/upload"  # Deployed API
+#API_URL = "http://127.0.0.1:10000/upload"  # Local Flask API
+API_URL = "https://ai-python-resume-keyword-scanner.onrender.com/upload"  # Deployed API
 
 # Debug: Show API URL in the sidebar
 st.sidebar.write(f"🌍 API URL: {API_URL}")
