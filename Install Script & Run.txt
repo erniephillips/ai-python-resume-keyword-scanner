@@ -10,4 +10,4 @@ Run browser upload page, open new terminal: streamlit run ui.py
 # Web Service URL: https://ai-python-resume-keyword-scanner.onrender.com/upload
 # Front-end URL: ernie-phillips-ai-python-resume-keyword-scanner.streamlit.app
 
-# API URL Test: curl -k -X POST -F "resume=@_Resume20250217.pdf" -F "job_description=@Customer Service Representative.txt" https://ai-python-resume-keyword-scanner.onrender.com/upload
+# API URL Test: curl -k -X POST -F "resume=@CPhillips_Resume20250217.pdf" -F "job_description=@Customer Service Representative.txt" https://ai-python-resume-keyword-scanner.onrender.com/upload
