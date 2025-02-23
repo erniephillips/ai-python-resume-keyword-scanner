@@ -13,7 +13,6 @@ UPLOAD_FOLDER = "uploads"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 
-
 @app.route("/upload", methods=["POST"])
 def upload_files():
     if "resume" not in request.files or "job_description" not in request.files:
@@ -32,24 +31,28 @@ def upload_files():
     resume_text = clean_text(extract_text_from_pdf(resume_path))
     job_text = clean_text(extract_text_from_txt(job_path))
 
-    # Deep Learning Comparison
-    resume_embedding = get_text_embedding(resume_text)
-    job_embedding = get_text_embedding(job_text)
-    similarity_score = compute_similarity(resume_embedding, job_embedding)
-
-    # Set threshold for a good match
-    status = "good match" if similarity_score >= 0.7 else "needs improvement"
+    # Deep Learning Comparison with error handling
+    try:
+        resume_embedding = get_text_embedding(resume_text)
+        job_embedding = get_text_embedding(job_text)
+        similarity_score = compute_similarity(resume_embedding, job_embedding)
+        status = "good match" if similarity_score >= 0.7 else "needs improvement"
+    except Exception as e:
+        # Log the error if possible, and provide fallback values
+        print("Deep learning error:", e)
+        similarity_score = None
+        status = None
 
     # Run keyword matching as well
     missing_keywords = find_missing_keywords(resume_text, job_text)
 
     result = {
-        "similarity_score": float(np.round(similarity_score, 3)),
+        "similarity_score": float(np.round(similarity_score, 3)) if similarity_score is not None else None,
         "status": status,
         "missing_keywords": list(missing_keywords)
     }
     return jsonify(result)
 
-
 if __name__ == "__main__":
+    # In production, you may want to use gunicorn rather than app.run()
     app.run(debug=True)
