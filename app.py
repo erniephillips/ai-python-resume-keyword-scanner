@@ -10,7 +10,7 @@ app = Flask(__name__)
 
 # Allowed origins: your deployed Streamlit URL and localhost for testing.
 allowed_origins = [
-    "https://ernie-hillips-ai-python-resume-keyword-scanner.streamlit.app",
+    "https://ernie-phillips-ai-python-resume-keyword-scanner.streamlit.app",
     "http://localhost:8501"  # Adjust the port if needed.
 ]
 CORS(app, resources={r"/upload": {"origins": allowed_origins}})
