@@ -10,8 +10,11 @@ st.title("📄 AI-Based Resume Keyword Scanner")
 
 # Informational disclaimer
 st.info(
-    "Disclaimer: The URL functionality is experimental. The web scraper pulls all DOM data and uses basic NLP techniques "
-    "to extract text, rather than employing deep learning methods to decipher context or related content."
+    "Disclaimer: The URL functionality is experimental. The web scraper uses a basic user-agent "
+    "and extracts raw DOM text using BeautifulSoup with standard NLP preprocessing, rather than "
+    "employing advanced deep learning methods for contextual understanding—which are computationally more expensive. "
+    "Additionally, certain websites (e.g., Indeed) may implement HTTP 403 responses to block automated scraping, "
+    "potentially affecting data extraction reliability."
 )
 
 uploaded_resume = st.file_uploader("Upload your Resume (PDF or DOCX)", type=["pdf", "docx"])
