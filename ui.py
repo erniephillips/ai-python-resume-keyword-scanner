@@ -10,9 +10,10 @@ st.title("📄 AI-Based Resume Keyword Scanner")
 
 uploaded_resume = st.file_uploader("Upload your Resume (PDF or DOCX)", type=["pdf", "docx"])
 
-job_desc_option = st.radio("Provide Job Description via:", ("Upload TXT file", "Enter URL"))
-if job_desc_option == "Upload TXT file":
-    uploaded_job_desc = st.file_uploader("Upload Job Description (TXT)", type=["txt"])
+job_desc_option = st.radio("Provide Job Description via:", ("Upload File", "Enter URL"))
+if job_desc_option == "Upload File":
+    # Updated to allow PDF, DOCX, or TXT
+    uploaded_job_desc = st.file_uploader("Upload Job Description (PDF, DOCX, or TXT)", type=["pdf", "docx", "txt"])
     job_desc_url = ""
 else:
     uploaded_job_desc = None

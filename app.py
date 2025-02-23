@@ -30,7 +30,7 @@ def upload_files():
     has_job_url = "job_description_url" in request.form
 
     if not (has_job_file or has_job_url):
-        return jsonify({"error": "Please provide a job description as a file (TXT or DOCX) or as a URL."}), 400
+        return jsonify({"error": "Please provide a job description as a file (PDF, DOCX, or TXT) or as a URL."}), 400
 
     resume_file = request.files["resume"]
     resume_path = os.path.join(UPLOAD_FOLDER, resume_file.filename)
@@ -63,8 +63,10 @@ def upload_files():
             job_text = extract_text_from_txt(job_path)
         elif job_filename.endswith(".docx"):
             job_text = extract_text_from_docx(job_path)
+        elif job_filename.endswith(".pdf"):
+            job_text = extract_text_from_pdf(job_path)
         else:
-            return jsonify({"error": "Unsupported job description file format. Use TXT or DOCX."}), 400
+            return jsonify({"error": "Unsupported job description file format. Use PDF, DOCX, or TXT."}), 400
 
     job_text = clean_text(job_text)
 
