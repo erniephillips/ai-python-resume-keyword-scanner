@@ -32,18 +32,20 @@ def upload_files():
         resume_text = clean_text(extract_text_from_pdf(resume_path))
         job_text = clean_text(extract_text_from_txt(job_path))
 
-        # Deep Learning Comparison
+        # Compute embeddings
         resume_embedding = get_text_embedding(resume_text)
         job_embedding = get_text_embedding(job_text)
+
+        # Similarity
         similarity_score = compute_similarity(resume_embedding, job_embedding)
+
     except Exception as e:
-        # Log the error details (you can also print to stdout for Render logs)
         return jsonify({"error": "Deep learning analysis failed", "details": str(e)}), 500
 
-    # Determine match status based on a threshold (0.7 in this case)
+    # Decide if it's a good match (threshold 0.7 for example)
     status = "good match" if similarity_score >= 0.7 else "needs improvement"
 
-    # Run keyword matching
+    # Keyword matching
     missing_keywords = find_missing_keywords(resume_text, job_text)
 
     result = {
@@ -54,5 +56,4 @@ def upload_files():
     return jsonify(result)
 
 if __name__ == "__main__":
-    # In production, you may want to use gunicorn rather than app.run()
     app.run(debug=True)
