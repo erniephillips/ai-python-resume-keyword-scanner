@@ -3,11 +3,13 @@ from resume_parser import extract_text_from_pdf
 from job_parser import extract_text_from_txt
 from text_cleaner import clean_text
 from keyword_matcher import find_missing_keywords
-from deep_learning_utils import get_text_embedding, compute_similarity
+from flask_cors import CORS
+
 import os
-import numpy as np
+
 
 app = Flask(__name__)
+CORS(app)
 
 UPLOAD_FOLDER = "uploads"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
@@ -27,33 +29,19 @@ def upload_files():
     resume_file.save(resume_path)
     job_file.save(job_path)
 
-    try:
-        # Extract and clean text
-        resume_text = clean_text(extract_text_from_pdf(resume_path))
-        job_text = clean_text(extract_text_from_txt(job_path))
+    # Extract and clean text
+    resume_text = clean_text(extract_text_from_pdf(resume_path))
+    job_text = clean_text(extract_text_from_txt(job_path))
 
-        # Deep Learning Comparison
-        resume_embedding = get_text_embedding(resume_text)
-        job_embedding = get_text_embedding(job_text)
-        similarity_score = compute_similarity(resume_embedding, job_embedding)
-    except Exception as e:
-        # Log the error details (you can also print to stdout for Render logs)
-        return jsonify({"error": "Deep learning analysis failed", "details": str(e)}), 500
-
-    # Determine match status based on a threshold (0.7 in this case)
-    status = "good match" if similarity_score >= 0.7 else "needs improvement"
-
-    # Run keyword matching
+    # Find missing keywords
     missing_keywords = find_missing_keywords(resume_text, job_text)
 
-    result = {
-        "similarity_score": float(np.round(similarity_score, 3)),
-        "status": status,
+    return jsonify({
         "missing_keywords": list(missing_keywords)
-    }
-    return jsonify(result)
+    })
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 10000))
-    app.run(host="0.0.0.0", port=port, debug=True)
+    app.run(debug=True)
 
+# RUN COMMAND: python app.py
+# CURL COMMAND: curl -X POST -F "resume=@CPhillips_Resume20250217.pdf" -F "job_description=@Customer Service Representative.txt" http://127.0.0.1:5000/upload
