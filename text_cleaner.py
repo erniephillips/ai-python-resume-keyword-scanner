@@ -2,7 +2,7 @@ import re
 import nltk
 from nltk.corpus import stopwords
 
-# Download stopwords
+# Download stopwords if not already available
 nltk.download('stopwords')
 stop_words = set(stopwords.words('english'))
 

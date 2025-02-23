@@ -1,4 +1,3 @@
-import os
 import requests
 from bs4 import BeautifulSoup
 
@@ -6,7 +5,6 @@ def extract_text_from_txt(txt_path):
     """Reads job description from a text file."""
     with open(txt_path, "r", encoding="utf-8") as file:
         return file.read().strip()
-
 
 def extract_text_from_url(url):
     """
@@ -19,7 +17,7 @@ def extract_text_from_url(url):
                       "Chrome/115.0.0.0 Safari/537.36",
         "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
         "Accept-Language": "en-US,en;q=0.5",
-        "Referer": url  # sometimes setting the Referer helps
+        "Referer": url
     }
 
     response = requests.get(url, headers=headers, timeout=10)
