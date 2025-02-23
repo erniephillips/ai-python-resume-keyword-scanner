@@ -8,6 +8,12 @@ API_URL = "https://ai-python-resume-keyword-scanner.onrender.com/upload"
 st.sidebar.write(f"🌍 API URL: {API_URL}")
 st.title("📄 AI-Based Resume Keyword Scanner")
 
+# Informational disclaimer
+st.info(
+    "Disclaimer: The URL functionality is experimental. The web scraper pulls all DOM data and uses basic NLP techniques "
+    "to extract text, rather than employing deep learning methods to decipher context or related content."
+)
+
 uploaded_resume = st.file_uploader("Upload your Resume (PDF or DOCX)", type=["pdf", "docx"])
 
 job_desc_option = st.radio("Provide Job Description via:", ("Upload File", "Enter URL"))
