@@ -7,7 +7,13 @@ from flask_cors import CORS
 import os
 
 app = Flask(__name__)
-CORS(app)
+
+# Allowed origins: your deployed Streamlit URL and localhost for testing.
+allowed_origins = [
+    "https://ernie-hillips-ai-python-resume-keyword-scanner.streamlit.app",
+    "http://localhost:8501"  # Adjust the port if needed.
+]
+CORS(app, resources={r"/upload": {"origins": allowed_origins}})
 
 UPLOAD_FOLDER = "uploads"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
@@ -30,7 +36,7 @@ def upload_files():
     resume_path = os.path.join(UPLOAD_FOLDER, resume_file.filename)
     resume_file.save(resume_path)
 
-    # Extract resume text based on file extension
+    # Decide how to extract resume text based on file extension
     resume_filename = resume_file.filename.lower()
     if resume_filename.endswith(".pdf"):
         resume_text = extract_text_from_pdf(resume_path)
@@ -56,7 +62,6 @@ def upload_files():
         if job_filename.endswith(".txt"):
             job_text = extract_text_from_txt(job_path)
         elif job_filename.endswith(".docx"):
-            # Directly use the imported function without re-importing.
             job_text = extract_text_from_docx(job_path)
         else:
             return jsonify({"error": "Unsupported job description file format. Use TXT or DOCX."}), 400
@@ -71,6 +76,5 @@ def upload_files():
     })
 
 if __name__ == "__main__":
-    # Bind to the port provided by Render (defaulting to 10000 if not set)
     port = int(os.environ.get("PORT", 10000))
     app.run(host="0.0.0.0", port=port, debug=True)

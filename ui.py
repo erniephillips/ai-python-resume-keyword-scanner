@@ -2,8 +2,8 @@ import streamlit as st
 import requests
 
 # Use your deployed API URL (or toggle for local testing)
-# API_URL = "https://ai-python-resume-keyword-scanner.onrender.com/upload"
-API_URL = "http://127.0.0.1:10000/upload"
+API_URL = "https://ai-python-resume-keyword-scanner.onrender.com/upload"
+#API_URL = "http://127.0.0.1:10000/upload"
 
 st.sidebar.write(f"🌍 API URL: {API_URL}")
 st.title("📄 Resume Keyword Scanner")
