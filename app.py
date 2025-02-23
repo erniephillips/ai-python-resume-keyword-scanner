@@ -3,17 +3,16 @@ from resume_parser import extract_text_from_pdf
 from job_parser import extract_text_from_txt
 from text_cleaner import clean_text
 from keyword_matcher import find_missing_keywords
-from flask_cors import CORS
-
+from deep_learning_utils import get_text_embedding, compute_similarity
 import os
-
+import numpy as np
 
 app = Flask(__name__)
-CORS(app)
 
 UPLOAD_FOLDER = "uploads"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
+
 
 @app.route("/upload", methods=["POST"])
 def upload_files():
@@ -33,15 +32,24 @@ def upload_files():
     resume_text = clean_text(extract_text_from_pdf(resume_path))
     job_text = clean_text(extract_text_from_txt(job_path))
 
-    # Find missing keywords
+    # Deep Learning Comparison
+    resume_embedding = get_text_embedding(resume_text)
+    job_embedding = get_text_embedding(job_text)
+    similarity_score = compute_similarity(resume_embedding, job_embedding)
+
+    # Set threshold for a good match
+    status = "good match" if similarity_score >= 0.7 else "needs improvement"
+
+    # Run keyword matching as well
     missing_keywords = find_missing_keywords(resume_text, job_text)
 
-    return jsonify({
+    result = {
+        "similarity_score": float(np.round(similarity_score, 3)),
+        "status": status,
         "missing_keywords": list(missing_keywords)
-    })
+    }
+    return jsonify(result)
+
 
 if __name__ == "__main__":
     app.run(debug=True)
-
-# RUN COMMAND: python app.py
-# CURL COMMAND: curl -X POST -F "resume=@CPhillips_Resume20250217.pdf" -F "job_description=@Customer Service Representative.txt" http://127.0.0.1:5000/upload
