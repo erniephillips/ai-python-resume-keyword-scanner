@@ -2,8 +2,8 @@ import streamlit as st
 import requests
 
 # Use your deployed API URL (or toggle for local testing)
-#API_URL = "https://ai-python-resume-keyword-scanner.onrender.com/upload"
-API_URL = "http://127.0.0.1:10000/upload"
+API_URL = "https://ai-python-resume-keyword-scanner.onrender.com/upload"
+#API_URL = "http://127.0.0.1:10000/upload"
 
 st.sidebar.write(f"🌍 API URL: {API_URL}")
 st.title("📄 AI-Based Resume Keyword Scanner")
@@ -32,22 +32,12 @@ if st.button("Analyze"):
             data["job_description_url"] = job_desc_url.strip()
 
         try:
-            response = requests.post(API_URL, files=files, data=data, timeout=20)
+            response = requests.post(API_URL, files=files, data=data, timeout=10)
             if response.status_code == 200:
                 result = response.json()
-                match_percentage = result.get("match_percentage", 0)
-                match_status = result.get("match_status", "Unknown")
                 missing_keywords = result.get("missing_keywords", [])
-
-                st.subheader("🔍 Match Analysis:")
-                st.write(f"**Match Percentage:** {match_percentage:.2f}%")
-                st.write(f"**Status:** {match_status}")
-
-                st.subheader("Missing Keywords:")
-                if missing_keywords:
-                    st.write(", ".join(missing_keywords))
-                else:
-                    st.write("✅ No missing keywords found!")
+                st.subheader("🔍 Missing Keywords:")
+                st.write(", ".join(missing_keywords) if missing_keywords else "✅ No missing keywords found!")
             else:
                 st.error(f"❌ Error analyzing the resume. Status: {response.status_code}")
         except requests.exceptions.ConnectionError:

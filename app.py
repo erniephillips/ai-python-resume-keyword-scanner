@@ -2,7 +2,7 @@ from flask import Flask, request, jsonify
 from resume_parser import extract_text_from_pdf, extract_text_from_docx
 from job_parser import extract_text_from_txt, extract_text_from_url
 from text_cleaner import clean_text
-from similarity_matcher import compute_similarity, find_missing_keywords
+from keyword_matcher import find_missing_keywords
 from flask_cors import CORS
 import os
 
@@ -32,11 +32,11 @@ def upload_files():
     if not (has_job_file or has_job_url):
         return jsonify({"error": "Please provide a job description as a file (PDF, DOCX, or TXT) or as a URL."}), 400
 
-    # Process Resume
     resume_file = request.files["resume"]
     resume_path = os.path.join(UPLOAD_FOLDER, resume_file.filename)
     resume_file.save(resume_path)
 
+    # Decide how to extract resume text based on file extension
     resume_filename = resume_file.filename.lower()
     if resume_filename.endswith(".pdf"):
         resume_text = extract_text_from_pdf(resume_path)
@@ -47,7 +47,7 @@ def upload_files():
 
     resume_text = clean_text(resume_text)
 
-    # Process Job Description
+    # Extract job description text
     if has_job_url:
         job_url = request.form.get("job_description_url")
         try:
@@ -70,22 +70,11 @@ def upload_files():
 
     job_text = clean_text(job_text)
 
-    # Compute similarity percentage and missing keywords
-    similarity_percentage = compute_similarity(resume_text, job_text)
+    # Find missing keywords between the resume and job description texts
     missing_keywords = find_missing_keywords(resume_text, job_text)
 
-    # Define status thresholds
-    if similarity_percentage >= 70:
-        status = "Close Match"
-    elif similarity_percentage >= 50:
-        status = "Moderate Match"
-    else:
-        status = "Not Close"
-
     return jsonify({
-        "match_percentage": similarity_percentage,
-        "match_status": status,
-        "missing_keywords": missing_keywords
+        "missing_keywords": list(missing_keywords)
     })
 
 if __name__ == "__main__":
