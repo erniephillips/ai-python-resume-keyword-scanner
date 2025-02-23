@@ -32,20 +32,18 @@ def upload_files():
         resume_text = clean_text(extract_text_from_pdf(resume_path))
         job_text = clean_text(extract_text_from_txt(job_path))
 
-        # Compute embeddings
+        # Deep Learning Comparison
         resume_embedding = get_text_embedding(resume_text)
         job_embedding = get_text_embedding(job_text)
-
-        # Similarity
         similarity_score = compute_similarity(resume_embedding, job_embedding)
-
     except Exception as e:
+        # Log the error details (you can also print to stdout for Render logs)
         return jsonify({"error": "Deep learning analysis failed", "details": str(e)}), 500
 
-    # Decide if it's a good match (threshold 0.7 for example)
+    # Determine match status based on a threshold (0.7 in this case)
     status = "good match" if similarity_score >= 0.7 else "needs improvement"
 
-    # Keyword matching
+    # Run keyword matching
     missing_keywords = find_missing_keywords(resume_text, job_text)
 
     result = {
@@ -56,4 +54,6 @@ def upload_files():
     return jsonify(result)
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    port = int(os.environ.get("PORT", 10000))
+    app.run(host="0.0.0.0", port=port, debug=True)
+

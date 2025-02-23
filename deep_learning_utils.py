@@ -1,25 +1,34 @@
-# deep_learning_utils.py
-
-from sentence_transformers import SentenceTransformer
+from transformers import AutoTokenizer, AutoModel
+import torch
 import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
 
-# Load a small, fast model at startup
-model = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
+# Load the tokenizer and model once at startup
+tokenizer = AutoTokenizer.from_pretrained("distilbert-base-uncased")
+model = AutoModel.from_pretrained("distilbert-base-uncased")
+model.eval()  # Set the model to evaluation mode
 
 def get_text_embedding(text):
     """
-    Returns an embedding vector for the given text using a Sentence-Transformers model.
+    Given a text string, returns the average embedding vector using DistilBERT.
+    Uses torch.no_grad() for efficient inference.
     """
-    # The 'encode' method returns a NumPy array if convert_to_numpy=True
-    embedding = model.encode(text, convert_to_numpy=True)
-    return embedding
+    inputs = tokenizer(text, return_tensors="pt", truncation=True, max_length=512)
+    with torch.no_grad():
+        outputs = model(**inputs)
+    # Get the last hidden state, shape: (batch_size, sequence_length, hidden_size)
+    embeddings = outputs.last_hidden_state
+    # Average the token embeddings along the sequence length dimension
+    avg_embedding = torch.mean(embeddings, dim=1)
+    # Ensure the embedding is on the CPU and return as a numpy array
+    return avg_embedding.detach().cpu().numpy()[0]
 
 def compute_similarity(embedding1, embedding2):
     """
-    Compute cosine similarity between two embedding vectors (1 = very similar, 0 = dissimilar).
+    Compute cosine similarity between two embedding vectors.
+    Returns a value between 0 and 1 (1 means very similar).
     """
     embedding1 = embedding1.reshape(1, -1)
     embedding2 = embedding2.reshape(1, -1)
     similarity = cosine_similarity(embedding1, embedding2)
-    return float(similarity[0][0])
+    return similarity[0][0]
