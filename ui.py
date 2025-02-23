@@ -11,7 +11,7 @@ else:
 st.sidebar.write(f"🌍 API URL: {API_URL}")
 
 # Streamlit UI
-st.title("📄 Resume Keyword Scanner")
+st.title("📄 AI-Based Resume Keyword Scanner")
 
 uploaded_resume = st.file_uploader("Upload your Resume (PDF)", type=["pdf"])
 uploaded_job_desc = st.file_uploader("Upload Job Description (TXT)", type=["txt"])
