@@ -43,7 +43,4 @@ col1, col2 = st.columns([2, 1])  # Adjusts spacing (2 parts empty, 1 part text)
 with col2:
     st.markdown("Developed by **Ernie Phillips III**", unsafe_allow_html=True)
 
-
-
-
 st.sidebar.write(f"🚀 Final API in use: {API_URL}")
