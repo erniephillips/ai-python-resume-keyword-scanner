@@ -1,24 +1,27 @@
 from transformers import AutoTokenizer, AutoModel
 import torch
+import numpy as np
+from sklearn.metrics.pairwise import cosine_similarity
 
-# Load the model and tokenizer once at startup
+# Load the tokenizer and model once at startup
 tokenizer = AutoTokenizer.from_pretrained("distilbert-base-uncased")
 model = AutoModel.from_pretrained("distilbert-base-uncased")
+model.eval()  # Set the model to evaluation mode
 
 def get_text_embedding(text):
     """
     Given a text string, returns the average embedding vector using DistilBERT.
+    Uses torch.no_grad() for efficient inference.
     """
     inputs = tokenizer(text, return_tensors="pt", truncation=True, max_length=512)
-    outputs = model(**inputs)
-    # The last_hidden_state has shape: (batch_size, sequence_length, hidden_size)
+    with torch.no_grad():
+        outputs = model(**inputs)
+    # Get the last hidden state, shape: (batch_size, sequence_length, hidden_size)
     embeddings = outputs.last_hidden_state
-    # Average the token embeddings (across sequence length)
+    # Average the token embeddings along the sequence length dimension
     avg_embedding = torch.mean(embeddings, dim=1)
-    return avg_embedding.detach().numpy()[0]
-
-from sklearn.metrics.pairwise import cosine_similarity
-import numpy as np
+    # Ensure the embedding is on the CPU and return as a numpy array
+    return avg_embedding.detach().cpu().numpy()[0]
 
 def compute_similarity(embedding1, embedding2):
     """

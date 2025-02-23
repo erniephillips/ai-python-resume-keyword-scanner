@@ -27,27 +27,27 @@ def upload_files():
     resume_file.save(resume_path)
     job_file.save(job_path)
 
-    # Extract and clean text
-    resume_text = clean_text(extract_text_from_pdf(resume_path))
-    job_text = clean_text(extract_text_from_txt(job_path))
-
-    # Deep Learning Comparison with error handling
     try:
+        # Extract and clean text
+        resume_text = clean_text(extract_text_from_pdf(resume_path))
+        job_text = clean_text(extract_text_from_txt(job_path))
+
+        # Deep Learning Comparison
         resume_embedding = get_text_embedding(resume_text)
         job_embedding = get_text_embedding(job_text)
         similarity_score = compute_similarity(resume_embedding, job_embedding)
-        status = "good match" if similarity_score >= 0.7 else "needs improvement"
     except Exception as e:
-        # Log the error if possible, and provide fallback values
-        print("Deep learning error:", e)
-        similarity_score = None
-        status = None
+        # Log the error details (you can also print to stdout for Render logs)
+        return jsonify({"error": "Deep learning analysis failed", "details": str(e)}), 500
 
-    # Run keyword matching as well
+    # Determine match status based on a threshold (0.7 in this case)
+    status = "good match" if similarity_score >= 0.7 else "needs improvement"
+
+    # Run keyword matching
     missing_keywords = find_missing_keywords(resume_text, job_text)
 
     result = {
-        "similarity_score": float(np.round(similarity_score, 3)) if similarity_score is not None else None,
+        "similarity_score": float(np.round(similarity_score, 3)),
         "status": status,
         "missing_keywords": list(missing_keywords)
     }
