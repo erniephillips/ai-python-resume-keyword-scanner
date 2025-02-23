@@ -8,20 +8,16 @@ API_URL = "https://ai-python-resume-keyword-scanner.onrender.com/upload"
 st.sidebar.write(f"🌍 API URL: {API_URL}")
 st.title("📄 AI-Based Resume Keyword Scanner")
 
-# Informational disclaimer
 st.info(
-    "Disclaimer: The URL functionality is experimental. The web scraper uses a basic user-agent "
-    "and extracts raw DOM text using BeautifulSoup with standard NLP preprocessing, rather than "
-    "employing advanced deep learning methods for contextual understanding—which are computationally more expensive. "
-    "Additionally, certain websites (e.g., Indeed) may implement HTTP 403 responses to block automated scraping, "
-    "potentially affecting data extraction reliability."
+    "Disclaimer: The URL functionality is experimental. The web scraper now uses boilerpy3 to extract the main content from job posting URLs. "
+    "This filters out menus, headers, and other extraneous text. However, some websites (e.g., Indeed) may block automated scraping, in which case "
+    "please provide the job description as a file instead."
 )
 
 uploaded_resume = st.file_uploader("Upload your Resume (PDF or DOCX)", type=["pdf", "docx"])
 
 job_desc_option = st.radio("Provide Job Description via:", ("Upload File", "Enter URL"))
 if job_desc_option == "Upload File":
-    # Updated to allow PDF, DOCX, or TXT
     uploaded_job_desc = st.file_uploader("Upload Job Description (PDF, DOCX, or TXT)", type=["pdf", "docx", "txt"])
     job_desc_url = ""
 else:
@@ -30,7 +26,6 @@ else:
 
 if st.button("Analyze"):
     if uploaded_resume and (uploaded_job_desc or job_desc_url):
-        # Ensure file pointer is at the beginning.
         uploaded_resume.seek(0)
         files = {"resume": (uploaded_resume.name, uploaded_resume, uploaded_resume.type)}
         data = {}
@@ -44,11 +39,26 @@ if st.button("Analyze"):
             response = requests.post(API_URL, files=files, data=data, timeout=10)
             if response.status_code == 200:
                 result = response.json()
+                match_percentage = result.get("match_percentage", "N/A")
+                status = result.get("status", "N/A")
                 missing_keywords = result.get("missing_keywords", [])
+
+                st.subheader("📊 Resume Analysis Results")
+                st.write(f"**Match Percentage:** {match_percentage}%")
+                st.write(f"**Status:** {status}")
                 st.subheader("🔍 Missing Keywords:")
-                st.write(", ".join(missing_keywords) if missing_keywords else "✅ No missing keywords found!")
+                if missing_keywords:
+                    for keyword in missing_keywords:
+                        st.markdown(f"- {keyword}")
+                else:
+                    st.success("✅ No missing keywords found!")
             else:
-                st.error(f"❌ Error analyzing the resume. Status: {response.status_code}")
+                try:
+                    error_result = response.json()
+                    error_message = error_result.get("error", f"Status: {response.status_code}")
+                    st.error(f"❌ Error analyzing the resume. {error_message}")
+                except Exception:
+                    st.error(f"❌ Error analyzing the resume. Status: {response.status_code}")
         except requests.exceptions.ConnectionError:
             st.error("❌ Connection Error: Unable to reach API. Check if Flask API is running.")
         except requests.exceptions.Timeout:
