@@ -6,7 +6,7 @@ API_URL = "https://ai-python-resume-keyword-scanner.onrender.com/upload"
 #API_URL = "http://127.0.0.1:10000/upload"
 
 st.sidebar.write(f"🌍 API URL: {API_URL}")
-st.title("📄 Resume Keyword Scanner")
+st.title("📄 AI-Based Resume Keyword Scanner")
 
 uploaded_resume = st.file_uploader("Upload your Resume (PDF or DOCX)", type=["pdf", "docx"])
 
